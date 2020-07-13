@@ -2,6 +2,7 @@
 ### Project specific variables
 GPU_ARCHS     ?= 70
 CUDA_HOME     ?= /usr/local/cuda
+VERBOSE       ?= 0
 ### Project specific variables
 
 ### Project specific constants
@@ -39,6 +40,12 @@ TEST_CXX_SRCS := $(shell find $(TEST_DIR) -name "*.cpp")
 TEST_CU_OBJS  := $(patsubst %.cu,%.cu.o,$(TEST_CU_SRCS))
 TEST_CXX_OBJS := $(patsubst %.cpp,%.cpp.o,$(TEST_CXX_SRCS))
 TEST_OBJS     := $(TEST_CU_OBJS) $(TEST_CXX_OBJS)
+ifeq ($(VERBOSE),1)
+    PREFIX    :=
+else
+    PREFIX    := @
+endif
+
 
 default:
 	@echo "make what? Available targets are:"
@@ -61,20 +68,32 @@ debug:
 exe: $(EXE)
 
 $(EXE): $(OBJS)
-	$(LD) $(LDLFAGS) -o $@ $^
+	@if [ "$(VERBOSE)" = "0" ]; then \
+	    echo "Building $@ ..."; \
+	fi
+	$(PREFIX)$(LD) $(LDLFAGS) -o $@ $^
 
 .PHONY: test
 test: $(CATCH2_DIR) $(TEST_EXE)
 	./$(TEST_EXE)
 
 $(TEST_EXE): $(TEST_OBJS) $(OBJS)
-	$(LD) $(LDFLAGS) -o $@ $^
+	@if [ "$(VERBOSE)" = "0" ]; then \
+	    echo "Building $@ ..."; \
+	fi
+	$(PREFIX)$(LD) $(LDFLAGS) -o $@ $^
 
 %.cu.o: %.cu
-	$(NVCC) $(NVCCFLAGS) -c -o $@ $<
+	@if [ "$(VERBOSE)" = "0" ]; then \
+	    echo "Compiling CUDA source $@ ..."; \
+	fi
+	$(PREFIX)$(NVCC) $(NVCCFLAGS) -c -o $@ $<
 
 %.cpp.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
+	@if [ "$(VERBOSE)" = "0" ]; then \
+	    echo "Compiling CXX  source $@ ..."; \
+	fi
+	$(PREFIX)$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 $(CATCH2_DIR):
 	git clone https://github.com/catchorg/Catch2 $@
