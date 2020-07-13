@@ -28,7 +28,7 @@ constexpr __host__ __device__ inline int_t ceil_div(int_t a, int_t b) {
  */
 template <typename int_t>
 constexpr __host__ __device__ inline int_t align_to(int_t a, int_t b) {
-  return ceildiv(a, b) * b;
+  return ceil_div(a, b) * b;
 }
 
 /**
