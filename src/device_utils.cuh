@@ -85,6 +85,33 @@ __device__ inline int lane_id() {
 }
 
 /**
+ * @defgroup LaneMaskUtils Utility methods to obtain lane mask. Refer to the
+ *           PTX ISA document to know more details on these masks.
+ * @{
+ */
+__device__ inline unsigned lanemask_lt() {
+  unsigned mask;
+  asm("mov.u32 %0, %%lanemask_lt;" : "=r"(mask));
+  return mask;
+}
+__device__ inline unsigned lanemask_le() {
+  unsigned mask;
+  asm("mov.u32 %0, %%lanemask_le;" : "=r"(mask));
+  return mask;
+}
+__device__ inline unsigned lanemask_gt() {
+  unsigned mask;
+  asm("mov.u32 %0, %%lanemask_gt;" : "=r"(mask));
+  return mask;
+}
+__device__ inline unsigned lanemask_ge() {
+  unsigned mask;
+  asm("mov.u32 %0, %%lanemask_ge;" : "=r"(mask));
+  return mask;
+}
+/** @} */
+
+/**
  * @brief warp-wide any boolean aggregator
  *
  * @param[in] in_flag flag to be checked across threads in the warp
@@ -116,50 +143,6 @@ __device__ inline bool all(bool in_flag, uint32_t mask = 0xffffffffu) {
   in_flag = __all(in_flag);
 #endif
   return in_flag;
-}
-
-/**
- * @brief Shuffle the data inside a warp
- *
- * @tparam T the data type (currently assumed to be 4B)
- *
- * @param[in] val      value to be shuffled
- * @param[in] src_lane lane from where to shuffle
- * @param[in] width    lane width
- * @param[in] mask     mask of participating threads (Volta+)
- *
- * @return the shuffled data
- */
-template <typename T>
-__device__ inline T shfl(T val, int src_lane, int width = WarpSize,
-                         uint32_t mask = 0xffffffffu) {
-#if CUDART_VERSION >= 9000
-  return __shfl_sync(mask, val, src_lane, width);
-#else
-  return __shfl(val, src_lane, width);
-#endif
-}
-
-/**
- * @brief Shuffle the data inside a warp
- *
- * @tparam T the data type (currently assumed to be 4B)
- *
- * @param[in] val       value to be shuffled
- * @param[in] lane_mask mask to be applied in order to perform xor shuffle
- * @param[in] width     lane width
- * @param[in] mask      mask of participating threads (Volta+)
- *
- * @return the shuffled data
- */
-template <typename T>
-__device__ inline T shfl_xor(T val, int lane_mask, int width = WarpSize,
-                             uint32_t mask = 0xffffffffu) {
-#if CUDART_VERSION >= 9000
-  return __shfl_xor_sync(mask, val, lane_mask, width);
-#else
-  return __shfl_xor(val, lane_mask, width);
-#endif
 }
 
 }  // namespace cuda
