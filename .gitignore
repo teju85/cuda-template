@@ -2,3 +2,5 @@
 *.cpp.o
 catch2/
 test-cuda-template
+core
+
