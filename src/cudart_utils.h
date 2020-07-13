@@ -11,7 +11,7 @@ namespace cuda {
   do {                                                             \
     std::string msg;                                               \
     char errMsg[2048];                                             \
-    nsprintf(errMsg, 2048, "Exception occured! file=%s line=%d: ", \
+    snprintf(errMsg, 2048, "Exception occured! file=%s line=%d: ", \
              __FILE__, __LINE__);                                  \
     msg += errMsg;                                                 \
     sprintf(errMsg, fmt, ##__VA_ARGS__);                           \

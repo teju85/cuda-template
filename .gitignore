@@ -1,3 +1,4 @@
 *.cu.o
 *.cpp.o
-./catch2/
+catch2/
+test-cuda-template
