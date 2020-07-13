@@ -56,7 +56,7 @@ $(EXE): $(OBJS)
 	$(LD) $(LDLFAGS) -o $@ $^
 
 .PHONY: test
-test: $(TEST_EXE)
+test: $(CATCH2_DIR) $(TEST_EXE)
 	./$(TEST_EXE)
 
 $(TEST_EXE): $(TEST_OBJS) $(OBJS)
@@ -67,6 +67,9 @@ $(TEST_EXE): $(TEST_OBJS) $(OBJS)
 
 %.cpp.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+$(CATCH2_DIR):
+	git clone https://github.com/catchorg/Catch2 $@
 
 .PHONY: clean
 clean:
